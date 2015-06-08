@@ -12,6 +12,7 @@
     
     ICDeviceBrowser * deviceBrowser;
     NSMutableArray * scanners;
+    NSString* imageURL;
 }
 
 -(void) run;

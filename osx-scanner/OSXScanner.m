@@ -19,6 +19,8 @@
         return;
     }
     
+    imageURL = @"";
+    
     ICScannerDevice* scanner = [scanners objectAtIndex:0];
     
     NSSize s;
@@ -83,7 +85,7 @@
 - (void)scannerDevice:(ICScannerDevice*)scanner didScanToURL:(NSURL*)url data:(NSData*)data
 {
     NSLog(@"{state:'Scan complete'}");
-    NSLog(@"{image:'%@'}", url );
+    imageURL = [url absoluteString];
 }
 
 - (void)device:(ICDevice*)device didReceiveStatusInformation:(NSDictionary*)status
@@ -121,11 +123,15 @@
 - (void)scannerDevice:(ICScannerDevice*)scanner didCompleteScanWithError:(NSError*)error;
 {
     if(error != nil) {
-        NSLog(@"{error:'%@'", [error localizedDescription]);
+        NSLog(@"{{state:'finished', error:'%@'", [error localizedDescription]);
+    }else {
+        NSLog(@"{state:'finished', imagePath: '%@'}", imageURL);
     }
-    NSLog(@"{state:'finished'}");
-    [scanner requestCloseSession];
-    
+    @try {
+        [scanner requestCloseSession];
+    }
+    @catch (NSException *exception) {
+    }
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
