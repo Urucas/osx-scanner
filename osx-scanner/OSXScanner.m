@@ -12,21 +12,10 @@
 
 @implementation OSXScanner
 
--(void) search4Scanners {
-    
-    scanners = [[NSMutableArray alloc] initWithCapacity:0];
-    
-    deviceBrowser = [[ICDeviceBrowser alloc] init];
-    deviceBrowser.delegate = self;
-    
-    deviceBrowser.browsedDeviceTypeMask =  ICDeviceLocationTypeMaskLocal|ICDeviceLocationTypeMaskRemote|ICDeviceTypeMaskScanner;
-    [deviceBrowser start];
-}
-
 - (void) startScan {
     
     if([scanners count] == 0) {
-        NSLog(@"No devices found");
+        NSLog(@"{error:'No devices found'}");
         return;
     }
     
@@ -56,64 +45,64 @@
 
 -(void) run {
     
-    [self search4Scanners];
-    // ICScannerDevice* scanner = [scanners objectAtIndex:0];
-    // [scanner requestSelectFunctionalUnit:(ICScannerFunctionalUnitType) ICScannerFunctionalUnitTypeFlatbed ];
+    scanners = [[NSMutableArray alloc] initWithCapacity:0];
+    
+    deviceBrowser = [[ICDeviceBrowser alloc] init];
+    deviceBrowser.delegate = self;
+    
+    deviceBrowser.browsedDeviceTypeMask =  ICDeviceLocationTypeMaskLocal|ICDeviceLocationTypeMaskRemote|ICDeviceTypeMaskScanner;
+    [deviceBrowser start];
 }
 
 
 #pragma mark delegate methods
 - (void)deviceDidBecomeReady:(ICScannerDevice*)scanner{
-    NSLog(@"device ready %@", [scanner name]);
+    NSLog(@"{state:'device ready %@'}", [scanner name]);
 }
 
 - (void)device:(ICDevice*)device didOpenSessionWithError:(NSError*)error
 {
-    NSLog(@"device:didOpenSessionWithError: \n");
-    NSLog(@"error : %@\n", error);
+    if(error != nil) {
+        NSLog(@"{error: '%@'}", [error localizedDescription]);
+    }
 }
 
 - (void)device:(ICDevice*)device didCloseSessionWithError:(NSError*)error
 {
-    NSLog(@"device:didCloseSessionWithError: \n");
-    NSLog(@"  error : %@\n", error);
+    if(error != nil) {
+        NSLog(@"{error: '%@'}", [error localizedDescription]);
+    }
 }
 
 - (void)scannerDevice:(ICScannerDevice*)scanner didSelectFunctionalUnit:(ICScannerFunctionalUnit*)functionalUnit error:(NSError*)error
 {
-    NSLog(@"selected functionalUnitType: %ld\n", scanner.selectedFunctionalUnit.type);
-    NSLog(@"Starting scan...");
+    NSLog(@"{state:'Starting scan'}");
     [self startScan];
 }
 
 - (void)scannerDevice:(ICScannerDevice*)scanner didScanToURL:(NSURL*)url data:(NSData*)data
 {
-    NSLog(@"Scan complete.");
-    NSLog( @"scannerDevice:didScanToURL:data: \n" );
-    NSLog( @"  url:     %@", url );
-    NSLog( @"  data:    %p\n", data );
+    NSLog(@"{state:'Scan complete'}");
+    NSLog(@"{image:'%@'}", url );
 }
 
 - (void)device:(ICDevice*)device didReceiveStatusInformation:(NSDictionary*)status
 {
-    NSLog( @"device: \n%@\ndidReceiveStatusInformation: \n%@\n", device, status );
-    if ( [[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmingUp] ) {
-        NSLog(@"Scanner warming up...");
+    if ([[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmingUp]){
+        NSLog(@"{state:'Scanner warming up}'");
     }
-    else if ( [[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmUpDone] ) {
-        NSLog(@"Scanner done warming up.");
+    else if ([[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmUpDone]){
+        NSLog(@"{state:'Scanner done warming up'}");
     }
 }
 
 - (void)deviceBrowser:(ICDeviceBrowser*)browser didAddDevice:(ICDevice*)addedDevice moreComing:(BOOL)moreComing
 {
     if ( (addedDevice.type & ICDeviceTypeMaskScanner) == ICDeviceTypeScanner ) {
-        NSLog(@"device name %@", addedDevice.name);
         addedDevice.delegate = self;
         [self willChangeValueForKey:@"scanners"];
         [scanners addObject:addedDevice];
         [self didChangeValueForKey:@"scanners"];
-        
         
         ICScannerDevice* scanner = [scanners objectAtIndex:0];
             [scanner requestSelectFunctionalUnit:(ICScannerFunctionalUnitType) ICScannerFunctionalUnitTypeFlatbed ];
@@ -131,7 +120,10 @@
 
 - (void)scannerDevice:(ICScannerDevice*)scanner didCompleteScanWithError:(NSError*)error;
 {
-    NSLog(@"didCompleteScanWithError %@", error);
+    if(error != nil) {
+        NSLog(@"{error:'%@'", [error localizedDescription]);
+    }
+    NSLog(@"{state:'finished'}");
     [scanner requestCloseSession];
     
     CFRunLoopStop(CFRunLoopGetCurrent());
