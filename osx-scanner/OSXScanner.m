@@ -28,6 +28,9 @@
         return;
     }
     
+    int timestamp = [[NSDate date] timeIntervalSince1970];
+    NSString* imageName = [NSString stringWithFormat:@"%d", timestamp];
+    
     fu.measurementUnit  = ICScannerMeasurementUnitInches;
     s = ((ICScannerFunctionalUnitFlatbed*)fu).physicalSize;
     fu.scanArea   = NSMakeRect( 0.0, 0.0, s.width, s.height );
@@ -37,7 +40,7 @@
     scanner.transferMode            = ICScannerTransferModeFileBased;
     scanner.downloadsDirectory      = [NSURL fileURLWithPath:NSTemporaryDirectory()];
     //    scanner.downloadsDirectory      = [NSURL fileURLWithPath:[@"~/" stringByExpandingTildeInPath]];
-    scanner.documentName            = @"ScanImage";
+    scanner.documentName            = imageName;
     scanner.documentUTI             = (id)kUTTypeJPEG;
     
     [scanner requestOpenSession];
@@ -46,9 +49,9 @@
 
 - (void) logParam:(NSString*) param withValue: (NSString *) value {
     
-    NSString* msg = @"[";
+    NSString* msg = @"['";
     msg = [msg stringByAppendingString:param];
-    msg = [msg stringByAppendingString:@"='"];
+    msg = [msg stringByAppendingString:@"'='"];
     msg = [msg stringByAppendingString:value];
     msg = [msg stringByAppendingString:@"']"];
     
@@ -69,7 +72,7 @@
 
 #pragma mark delegate methods
 - (void)deviceDidBecomeReady:(ICScannerDevice*)scanner{
-    NSString* deviceName = @"device ready ";
+    NSString* deviceName = @"Device ready ";
     deviceName = [deviceName stringByAppendingString:[scanner name]];
     [self logParam:@"state" withValue:deviceName];
 }
@@ -137,7 +140,7 @@
     if(error != nil) {
         [self logParam:@"error" withValue:[error localizedDescription]];
     }else {
-        [self logParam:@"state" withValue:@"finished"];
+        [self logParam:@"state" withValue:@"Finished"];
         [self logParam:@"imagePath" withValue:imageURL];
     }
     @try {
