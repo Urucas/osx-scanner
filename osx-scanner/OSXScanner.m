@@ -15,14 +15,13 @@
 - (void) startScan {
     
     if([scanners count] == 0) {
-        NSLog(@"{error:'No devices found'}");
+        [self logParam:@"error" withValue:@"No devices found"];
         return;
     }
     
     imageURL = @"";
     
     ICScannerDevice* scanner = [scanners objectAtIndex:0];
-    
     NSSize s;
     ICScannerFunctionalUnit*  fu = scanner.selectedFunctionalUnit;
     if(fu.scanInProgress == YES) {
@@ -45,6 +44,17 @@
     [scanner requestScan];
 }
 
+- (void) logParam:(NSString*) param withValue: (NSString *) value {
+    
+    NSString* msg = @"[";
+    msg = [msg stringByAppendingString:param];
+    msg = [msg stringByAppendingString:@"='"];
+    msg = [msg stringByAppendingString:value];
+    msg = [msg stringByAppendingString:@"']"];
+    
+    puts((char*)[msg UTF8String]);
+}
+
 -(void) run {
     
     scanners = [[NSMutableArray alloc] initWithCapacity:0];
@@ -59,42 +69,44 @@
 
 #pragma mark delegate methods
 - (void)deviceDidBecomeReady:(ICScannerDevice*)scanner{
-    NSLog(@"{state:'device ready %@'}", [scanner name]);
+    NSString* deviceName = @"device ready ";
+    deviceName = [deviceName stringByAppendingString:[scanner name]];
+    [self logParam:@"state" withValue:deviceName];
 }
 
 - (void)device:(ICDevice*)device didOpenSessionWithError:(NSError*)error
 {
     if(error != nil) {
-        NSLog(@"{error: '%@'}", [error localizedDescription]);
+        [self logParam:@"error" withValue:@"No devices found"];
     }
 }
 
 - (void)device:(ICDevice*)device didCloseSessionWithError:(NSError*)error
 {
     if(error != nil) {
-        NSLog(@"{error: '%@'}", [error localizedDescription]);
+        [self logParam:@"error" withValue:@"No devices found"];
     }
 }
 
 - (void)scannerDevice:(ICScannerDevice*)scanner didSelectFunctionalUnit:(ICScannerFunctionalUnit*)functionalUnit error:(NSError*)error
 {
-    NSLog(@"{state:'Starting scan'}");
+    [self logParam:@"state" withValue:@"Starting scan"];
     [self startScan];
 }
 
 - (void)scannerDevice:(ICScannerDevice*)scanner didScanToURL:(NSURL*)url data:(NSData*)data
 {
-    NSLog(@"{state:'Scan complete'}");
+    [self logParam:@"state" withValue:@"Scan complete"];
     imageURL = [url absoluteString];
 }
 
 - (void)device:(ICDevice*)device didReceiveStatusInformation:(NSDictionary*)status
 {
     if ([[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmingUp]){
-        NSLog(@"{state:'Scanner warming up}'");
+        [self logParam:@"state" withValue:@"Scanner warming up"];
     }
     else if ([[status objectForKey:ICStatusNotificationKey] isEqualToString:ICScannerStatusWarmUpDone]){
-        NSLog(@"{state:'Scanner done warming up'}");
+        [self logParam:@"state" withValue:@"Scanner done warming up"];
     }
 }
 
@@ -123,9 +135,10 @@
 - (void)scannerDevice:(ICScannerDevice*)scanner didCompleteScanWithError:(NSError*)error;
 {
     if(error != nil) {
-        NSLog(@"{{state:'finished', error:'%@'", [error localizedDescription]);
+        [self logParam:@"error" withValue:[error localizedDescription]];
     }else {
-        NSLog(@"{state:'finished', imagePath: '%@'}", imageURL);
+        [self logParam:@"state" withValue:@"finished"];
+        [self logParam:@"imagePath" withValue:imageURL];
     }
     @try {
         [scanner requestCloseSession];
