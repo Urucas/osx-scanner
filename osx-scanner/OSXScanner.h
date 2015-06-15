@@ -16,6 +16,7 @@
 }
 
 -(void) run;
+-(void) noScannerFound;
 
 @end
 

@@ -39,7 +39,6 @@
     fu.bitDepth                     = ICScannerBitDepth8Bits;
     scanner.transferMode            = ICScannerTransferModeFileBased;
     scanner.downloadsDirectory      = [NSURL fileURLWithPath:NSTemporaryDirectory()];
-    //    scanner.downloadsDirectory      = [NSURL fileURLWithPath:[@"~/" stringByExpandingTildeInPath]];
     scanner.documentName            = imageName;
     scanner.documentUTI             = (id)kUTTypeJPEG;
     
@@ -67,6 +66,21 @@
     
     deviceBrowser.browsedDeviceTypeMask =  ICDeviceLocationTypeMaskLocal|ICDeviceLocationTypeMaskRemote|ICDeviceTypeMaskScanner;
     [deviceBrowser start];
+    
+    // add timer
+    [NSTimer scheduledTimerWithTimeInterval:10.0
+        target:self
+        selector:@selector(noScannerFound)
+        userInfo:nil
+        repeats:NO];
+}
+
+-(void) noScannerFound {
+    if([scanners count] == 0) {
+        [self logParam:@"state" withValue:@"Finished"];
+        [self logParam:@"error" withValue:@"No scanners found"];
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }
 }
 
 
