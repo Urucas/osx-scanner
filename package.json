@@ -1,0 +1,24 @@
+{
+  "name": "osx-scanner",
+  "version": "0.0.1",
+  "description": "Scanning in osx from command line",
+  "main": "osx-scanner/osx-scanner",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Urucas/osx-scanner.git"
+  },
+  "keywords": [
+    "scan",
+    "scanner",
+    "osx"
+  ],
+  "author": "Urucas <hello@urucas.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Urucas/osx-scanner/issues"
+  },
+  "homepage": "https://github.com/Urucas/osx-scanner"
+}
