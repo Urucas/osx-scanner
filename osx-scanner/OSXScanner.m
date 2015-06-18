@@ -34,7 +34,7 @@
     fu.measurementUnit  = ICScannerMeasurementUnitInches;
     s = ((ICScannerFunctionalUnitFlatbed*)fu).physicalSize;
     fu.scanArea   = NSMakeRect( 0.0, 0.0, s.width, s.height );
-    fu.resolution = [fu.supportedResolutions indexGreaterThanOrEqualToIndex:300];
+    fu.resolution = [fu.supportedResolutions indexGreaterThanOrEqualToIndex:3   00];
     fu.pixelDataType = ICScannerPixelDataTypeRGB;
     fu.bitDepth                     = ICScannerBitDepth8Bits;
     scanner.transferMode            = ICScannerTransferModeFileBased;
