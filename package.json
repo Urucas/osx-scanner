@@ -1,6 +1,6 @@
 {
   "name": "osx-scanner",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Scanning in osx from command line",
   "main": "osx-scanner/osx-scanner",
   "scripts": {
@@ -19,6 +19,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Urucas/osx-scanner/issues"
+  },
+  "bin": {
+    "osx-scanner": "./osx-scanner/osx-scanner"
   },
   "homepage": "https://github.com/Urucas/osx-scanner"
 }
